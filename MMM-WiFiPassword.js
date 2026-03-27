@@ -12,6 +12,8 @@ Module.register("MMM-WiFiPassword", {
 	  showNetwork: true, // Display network name
 	  showPassword: true, // Display password
 	  showAuthType: true, // Dispay authentication type
+	  headerInQR: false, // Whether to display header inside QR code (true) or above it (false)
+	  showBackground: true, // Whether to show the glass background container
 	  debug: false
   },
   
@@ -46,11 +48,14 @@ Module.register("MMM-WiFiPassword", {
 	  var div = document.createElement("div");
 	  div.id = "WiFiPassword";
 	  div.className = "text";
-	  if (!this.config.layoutVertical) {
-		  div.style.height = this.config.qrSize + "px";
+	  
+	  // Add no-background class if showBackground is false
+	  if (!this.config.showBackground) {
+	  	div.className += " no-background";
 	  }
 	  
-	  if (this.config.header){
+	  // Add header before QR if headerInQR is false
+	  if (this.config.header && !this.config.headerInQR){
 	  	var header = document.createElement('header');
 	  	header.innerHTML = this.config.header;
 	  	div.appendChild(header);
@@ -64,13 +69,20 @@ Module.register("MMM-WiFiPassword", {
 		qrDiv.className += " layout-vertical";
 	  } else {
 		qrDiv.className += " layout-horizontal";
-	  }  
+	  }
+	  
+	  // Add header inside QR if headerInQR is true
+	  if (this.config.header && this.config.headerInQR){
+	  	var header = document.createElement('header');
+	  	header.innerHTML = this.config.header;
+	  	qrDiv.appendChild(header);
+	  }
+	  
 	  div.appendChild(qrDiv);
 
 	  var textDiv = document.createElement("div");
 	  textDiv.id = "textDiv";
-	  div.appendChild(textDiv);
-	
+	  
 
 	  if (this.config.showNetwork) {
 		var networkNameDiv = document.createElement("p");
@@ -98,6 +110,11 @@ Module.register("MMM-WiFiPassword", {
 		debugDiv.className = "text debug";
 		debugDiv.innerHTML = "<b>QR String:</b> " + this.qrText;
 		textDiv.appendChild(debugDiv);
+	  }
+	  
+	  // Only append textDiv if it has content
+	  if (textDiv.children.length > 0) {
+	  	div.appendChild(textDiv);
 	  }
 	  	  
 	  return div;
